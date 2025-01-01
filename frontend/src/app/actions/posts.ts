@@ -20,6 +20,7 @@ export const getPosts = async () => {
     const response = await apiFetch('api/posts', {
       method: 'GET',
     });
+    console.log("response", response);
     return response;
   } catch (error) {
     console.error('Error getting posts:', error);

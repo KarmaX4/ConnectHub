@@ -3,6 +3,11 @@ import { redirect } from "next/navigation";
 import { apiFetch } from "./fetch";
 import { signIn, signOut } from "../auth";
 
+// Define an error type
+type ApiError = {
+  message: string;
+  statusCode?: number;
+};
 
 export const register = async (user: {
   username: string;
@@ -16,9 +21,9 @@ export const register = async (user: {
     });
     console.log(response);
     return response;
-  } catch (error) {
+  } catch (error: unknown) {
     console.log(error);
-    return error;
+    return error as ApiError;
   }
 };
 
@@ -29,16 +34,16 @@ export const login = async (user: {
   try {
     console.log("login");
     await signIn("credentials", {
-        email: user.email,
-        password: user.password,
-      });
+      email: user.email,
+      password: user.password,
+    });
+    redirect("/");
+  } catch (error: unknown) {
+    if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
       redirect("/");
-  } catch (error: any) {
-    if (error.message.includes("NEXT_REDIRECT")) {
-        redirect("/");
-      } else {
-        return { statusCode: 401, message: "Wrong credentials! or You don't have access" };
-      }
+    } else {
+      return { statusCode: 401, message: "Wrong credentials! or You don't have access" };
+    }
   }
 };
 

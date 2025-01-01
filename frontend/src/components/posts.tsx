@@ -1,8 +1,8 @@
 "use client";
-import React, { useEffect, useState } from 'react'
-import Post from './Post'
-import { getPosts } from '@/app/actions/posts';
-import { useAppSelector } from '@/hooks/redux';
+import React, { useEffect, useState } from "react";
+import Post from "./Post";
+import { getPosts } from "@/app/actions/posts";
+import { useAppSelector } from "@/hooks/redux";
 
 const PostSkeleton = () => (
   <div className="p-4 border rounded-lg shadow animate-pulse">
@@ -13,22 +13,23 @@ const PostSkeleton = () => (
 );
 
 const Posts = ({ user }: { user: any }) => {
-    const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const trigger = useAppSelector((state) => state.posts.trigger);
-    
-    useEffect(() => {
-      const fetchPosts = async () => {
-        setLoading(true);
-        try {
-          const response: any = await getPosts();
-          setPosts(response.data);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchPosts();
-    }, [trigger]);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const trigger = useAppSelector((state) => state.posts.trigger);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setLoading(true);
+      try {
+        const response: any = await getPosts();
+        console.log("responseasa", response);
+        setPosts(response);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPosts();
+  }, [trigger]);
 
   if (loading) {
     return (
@@ -49,4 +50,4 @@ const Posts = ({ user }: { user: any }) => {
   );
 };
 
-export default Posts
+export default Posts;

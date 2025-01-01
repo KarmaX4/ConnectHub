@@ -7,82 +7,39 @@ type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 interface FetchOptions {
   method?: HttpMethod;
   headers?: HeadersInit;
-  body?: any;
+  body?: Record<string, unknown>;
   credentials?: RequestCredentials;
   cache?: RequestCache;
   mode?: RequestMode;
 }
 
-interface ApiResponse<T> {
-  data: T | null;
-  error: string | null;
-  status: number;
-}
-
-export async function apiFetch<T>(
+export const apiFetch = async <T>(
   endpoint: string,
   options: FetchOptions = {}
-): Promise<ApiResponse<T>> {
-  const authData = await auth();
-  const user = authData?.user
-  const token = user?.token
-  console.log("token =",token);
-  const defaultOptions: FetchOptions = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
-    credentials: 'include', 
+): Promise<T> => {
+  const session = await auth();
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/';
+  
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...options.headers as Record<string, string>,
   };
 
-  try {
-    const fetchOptions = {
-      ...defaultOptions,
-      ...options,
-      headers: {
-        ...defaultOptions.headers,
-        ...options.headers,
-      },
-    };
-
-    if (fetchOptions.body && typeof fetchOptions.body !== 'string') {
-      fetchOptions.body = JSON.stringify(fetchOptions.body);
-    }
-
-    // Make the fetch call
-    const response = await fetch(`http://localhost:5000/${endpoint}`, fetchOptions);
-    const status = response.status;
-
-    // Parse the response
-    let data = null;
-    try {
-      data = await response.json();
-    } catch (e) {
-      // Response might be empty or not JSON
-    }
-
-    // Handle unsuccessful responses
-    if (!response.ok) {
-      return {
-        data: null,
-        error: data?.message || 'An error occurred',
-        status,
-      };
-    }
-
-    // Return successful response
-    return {
-      data,
-      error: null,
-      status,
-    };
-  } catch (error) {
-    // Handle network errors or other exceptions
-    return {
-      data: null,
-      error: error instanceof Error ? error.message : 'Network error',
-      status: 0,
-    };
+  if (session?.user?.token) {
+    headers.Authorization = `Bearer ${session.user.token}`;
   }
-}
+
+  const response = await fetch(`${baseUrl}${endpoint}`, {
+    ...options,
+    headers,
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Something went wrong');
+  }
+
+  return data;
+};

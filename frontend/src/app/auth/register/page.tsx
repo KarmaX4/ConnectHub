@@ -40,16 +40,19 @@ export default function RegisterPage() {
         return;
       }
       
-     const {data} : any = await register({username, email, password});
-     console.log(data);
-     if(data.success){
-      router.push('/');
-      router.refresh();
-     }
-      // router.push('/');
-      // router.refresh();
-    } catch (error: any) {
-      setError(error.message);
+      const response = await register({username, email, password});
+      if (response && typeof response === 'object' && 'data' in response) {
+        if (response.data && typeof response.data === 'object' && 'success' in response.data) {
+          router.push('/');
+          router.refresh();
+        }
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
+      }
     } finally {
       setIsLoading(false);
     }

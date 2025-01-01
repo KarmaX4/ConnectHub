@@ -1,22 +1,27 @@
+import { NextAuthConfig } from 'next-auth';
 
-export const authConfig = {
-  providers:[],
+interface AuthRequest {
+  nextUrl: URL;
+}
+
+interface AuthContext {
+  auth: {
+    user: Record<string, unknown> | null;
+  } | null;
+  request: AuthRequest;
+}
+
+export const authConfig: NextAuthConfig = {
+  providers: [],
   pages: {
     signIn: "/auth/login",
-    register: "/auth/register",
+ 
   },
   callbacks: {
-    authorized({ auth, request }:{ auth : any, request: any }) {
-      const isLoggedIn = auth?.user
-      
-      // console.log("auth =",auth?.user);
-      
-    
+    authorized({ auth, request }: AuthContext) {
+      const isLoggedIn = auth?.user;
       const isOnDashboard = request.nextUrl.pathname.startsWith("/");
-      // const isHomePage = request.nextUrl.pathname === "/";
-      // if(isHomePage){
-      //   return Response.redirect(new URL("/", request.nextUrl));
-      // }
+      
       if (isOnDashboard) {
         if (isLoggedIn) return true;
         return false;

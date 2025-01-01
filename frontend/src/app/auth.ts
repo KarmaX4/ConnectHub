@@ -5,6 +5,9 @@ import { authConfig } from "./authconfig";
 declare module "next-auth" {
   interface Session {
     user: {
+      id: string;
+      email: string;
+      emailVerified: Date | null;
       user: {
         username: string;
         email: string;
@@ -14,7 +17,7 @@ declare module "next-auth" {
   }
 }
 
-const login = async (credentials: any) => {
+const login = async (credentials: { email: string; password: string }) => {
   try {
     // console.log("credentials =",credentials);
     const response = await fetch(
@@ -54,10 +57,13 @@ export const {
     CredentialsProvider({
       async authorize(credentials) {
         try {
-          const user = await login(credentials);
+          const user = await login(credentials as { email: string; password: string });
           return user;
-        } catch (err: any) {
-          throw new Error(err.message); 
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            throw new Error(err.message);
+          }
+          throw new Error('An unknown error occurred');
         }
       },
     }),
@@ -69,7 +75,13 @@ export const {
     },
     async session({ session, token }) {
       if (token) {
-        session.user = token as any;
+        session.user = {
+          id: token.id as string,
+          email: token.email as string,
+          emailVerified: null,
+          user: token.user as { username: string; email: string },
+          token: token.token as string,
+        };
       }
       return session;
     },

@@ -21,8 +21,12 @@ export default function LoginPage() {
       await login({email, password});
       router.push('/');
       router.refresh();
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -34,7 +38,7 @@ export default function LoginPage() {
         {/* Logo and Title */}
         <div className="text-center">
           <h1 className="text-4xl font-bold text-blue-600">ConnectHub</h1>
-          <p className="mt-2 text-gray-600">Welcome back! Please sign in to continue.</p>
+          <p className="mt-2 text-gray-600">{"Welcome back! Please sign in to continue."}</p>
         </div>
 
         {/* Error Message */}
@@ -145,7 +149,7 @@ export default function LoginPage() {
 
           {/* Register Link */}
           <div className="text-center mt-4">
-            <span className="text-gray-600">Don't have an account?</span>
+            <span className="text-gray-600">{"Don't have an account?"}</span>
             <Link 
               href="/auth/register"
               className="ml-1 font-medium text-blue-600 hover:text-blue-500"
