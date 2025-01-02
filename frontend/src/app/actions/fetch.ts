@@ -18,8 +18,7 @@ export const apiFetch = async <T>(
   options: FetchOptions = {}
 ): Promise<T> => {
   const session = await auth();
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/';
-  
+  const baseUrl = process.env.BASE_API_URL || 'http://localhost:5000/';
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...options.headers as Record<string, string>,
