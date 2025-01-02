@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "../auth";
+import { auth, signOut } from "../auth";
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
@@ -37,7 +37,11 @@ export const apiFetch = async <T>(
 
   const data = await response.json();
 
+  
   if (!response.ok) {
+    if (response.status === 401) {
+      await signOut();
+    }
     throw new Error(data.message || 'Something went wrong');
   }
 

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { register } from '@/app/actions/auth';
+import toast from 'react-hot-toast';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -41,17 +42,21 @@ export default function RegisterPage() {
       }
       
       const response = await register({username, email, password});
-      if (response && typeof response === 'object' && 'data' in response) {
-        if (response.data && typeof response.data === 'object' && 'success' in response.data) {
-          router.push('/');
-          router.refresh();
-        }
+      if (response && typeof response === 'object' && 'success' in response && response.success) {
+        toast.success('Account created successfully!');
+        await new Promise(resolve => setTimeout(resolve, 2000)); 
+        router.push('/');
+        router.refresh();
+      } else {
+        toast.error('Failed to create account');
       }
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
+        toast.error(error.message);
       } else {
         setError('An unknown error occurred');
+        toast.error('An unknown error occurred');
       }
     } finally {
       setIsLoading(false);
@@ -86,7 +91,7 @@ export default function RegisterPage() {
                 id="username"
                 name="username"
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="mt-1 block w-full px-3 text-black py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Choose a username"
               />
             </div>
@@ -100,7 +105,7 @@ export default function RegisterPage() {
                 id="email"
                 name="email"
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="mt-1 block w-full px-3 text-black py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Enter your email"
               />
             </div>
@@ -115,7 +120,7 @@ export default function RegisterPage() {
                 name="password"
                 required
                 onChange={(e) => checkPasswordStrength(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="mt-1 block w-full px-3 text-black py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Create a strong password"
               />
               {/* Password Strength Indicator */}
@@ -147,7 +152,7 @@ export default function RegisterPage() {
                 id="confirmPassword"
                 name="confirmPassword"
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="mt-1 block w-full px-3 text-black py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Confirm your password"
               />
             </div>

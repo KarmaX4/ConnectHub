@@ -19,7 +19,7 @@ declare module "next-auth" {
 
 const login = async (credentials: { email: string; password: string }) => {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/';
+    const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
     // console.log("credentials =",credentials);
     const response = await fetch(
       `${baseUrl}/api/auth/login`,

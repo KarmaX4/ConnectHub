@@ -66,3 +66,25 @@ export const likePost = async (id: string) => {
     throw error;
   }
 };
+
+// ... existing imports and code ...
+
+interface CommentData {
+  postId: string;
+  content: string;
+}
+
+export const addComment = async (commentData: CommentData) => {
+  try {
+    const response = await apiFetch(`api/posts/${commentData.postId}/comments`, {
+      method: 'POST',
+      body: { content: commentData.content }
+    });
+    return response;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error('Failed to add comment');
+  }
+};

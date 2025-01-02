@@ -20,9 +20,12 @@ export const authConfig: NextAuthConfig = {
   callbacks: {
     authorized({ auth, request }: AuthContext) {
       const isLoggedIn = auth?.user;
-      const isOnDashboard = request.nextUrl.pathname.startsWith("/");
+      const isOnDashboard = request.nextUrl.pathname.startsWith("/") && request.nextUrl.pathname === "/";
+      const isOnAuthPage = request.nextUrl.pathname.startsWith("/auth/");
       
-      if (isOnDashboard) {
+      if (isOnAuthPage) {
+        return true; 
+      } else if (isOnDashboard) {
         if (isLoggedIn) return true;
         return false;
       } else if (isLoggedIn) {
